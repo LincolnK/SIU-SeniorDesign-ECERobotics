@@ -3,6 +3,7 @@ from math import sin,cos,pi
 import numpy
 import rospy
 import tf2_ros
+from tf2_geometry_msgs import do_transform_point
 from tf.transformations import quaternion_from_euler
 from geometry_msgs.msg import Twist,Pose,Point,Quaternion, Vector3,TransformStamped
 from nav_msgs.msg import Odometry
@@ -22,6 +23,17 @@ coefficients = numpy.array([
 last_velocities = numpy.array([0,0,0])
 o_tf_broadcast = tf2_ros.TransformBroadcaster()
 odom_publisher = rospy.Publisher("odom",Odometry,queue_size=50)
+tf_buffer =tf2_ros.Buffer()
+
+
+def getNewPosition(point):
+    global tf_buffer
+    transform = tf_buffer.lookup_transform("world","base_link",rospy.Time(0))
+    newOdom = do_transform_point(Point(*point),transform)
+    return newOdom
+
+
+
 
 def publish_odom(current_velocities=None):
     global current_time
@@ -33,15 +45,19 @@ def publish_odom(current_velocities=None):
     print current_time
     print last_time
     dt = (current_time-last_time).to_sec()
-    totalOdom += last_velocities*float(dt)
+    dist = last_velocities*float(dt)
+    totalOdom[2]+=dist[2]#angular movement doesn't need to be changed tf frame
     print totalOdom
+    quat = Quaternion(*quaternion_from_euler(0,0,totalOdom[2]))
+    newPos=getNewPosition((dist[0],dist[1],0.))
+    totalOdom[0]=newPos[0]
+    totalOdom[1]=newPos[1]
     t = tf2_ros.TransformStamped()
     t.header.stamp=rospy.Time.now()
     t.header.frame_id='world'
     t.child_frame_id='base_link'
     t.transform.translation.x = totalOdom[0]
-    t.transform.translation.y = totalOdom[1]
-    quat = Quaternion(*quaternion_from_euler(0,0,totalOdom[2]))
+    t.transform.translation.y = totalOdom[0]
     t.transform.rotation = quat
     o_tf_broadcast.sendTransform(t)
     odom=Odometry()
@@ -78,6 +94,7 @@ def build_control_callback(right,left,back):
 def listener():
     global current_time
     global last_time
+    global tf_buffer
     try:
         rospy.init_node('base_controller')
         current_time = rospy.Time.now()
@@ -85,6 +102,8 @@ def listener():
         print current_time
         print last_time
         publish_rate = rospy.Rate(4)
+        tf_buffer  = tf2_ros.Buffer()
+        tf_listener = tf2_ros.TransformListener(tf_buffer)
         with Motor(20,21) as right, Motor(19,26) as left, Motor(6,13) as back:
             rospy.Subscriber("cmd_vel",Twist,build_control_callback(right,left,back))
             while not rospy.is_shutdown():
