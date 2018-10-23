@@ -1,0 +1,4 @@
+<launch>
+	<node package="ecer_test" name="basecontroller" type="BaseController"></node>
+	<node package="ecer_test" name="nav_generator" type="NavGenerator"></node>
+</launch>
