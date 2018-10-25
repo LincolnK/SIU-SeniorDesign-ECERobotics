@@ -13,7 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   nav_msgs
   geometry_msgs
+  sensor_msgs
   tf2
+  tf_conversions
+  rplidar_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -135,6 +138,11 @@ catkin_install_python(PROGRAMS nodes/BaseController
 )
 
 catkin_install_python(PROGRAMS nodes/InitialTFPublisher
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+
+catkin_install_python(PROGRAMS nodes/GroundSensors
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
