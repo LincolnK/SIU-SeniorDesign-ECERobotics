@@ -1,0 +1,15 @@
+
+#Choices are omni and diff. We use omni wheels, so that one
+odom_model_type: omni
+#odom_alpha1: 0.2 #expected rotational noise from rotation
+#odom_alpha2: 0.2 #expected translational noise from rotation
+#odom_alpha3: 0.2 #expected roational noise from linear motion
+#odom_alpha4: 0.2 #expected translational noise from linear motion
+odom_alpha5: 0.1 #expected perpendicular noise from motion (omni only)
+#odometry tf needs to be updated. I don't think this is currently published
+#See REP 105
+odom_frame_id: "odom"
+#post-dates transforms so that they will be valid into future
+transform_tolerance: 0.1
+
+laser_model_type: "beam"
