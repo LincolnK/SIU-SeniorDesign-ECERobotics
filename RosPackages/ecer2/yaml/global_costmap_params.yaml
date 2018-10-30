@@ -1,5 +1,5 @@
 global_costmap:
-        global_frame: /map
-        robot_base_frame: base_link
-        update_frequency: 5.0
-        static_map: true
+        global_frame: /map # defines the coordinate frame that the costmap will run in
+        robot_base_frame: base_link # defines the coordinate frame the costmap uses for the robot
+        update_frequency: 5.0 # defines frequecy in hertz that the costmap will run at. Reduce it if running slow
+        static_map: true # costmap will initalize based on map provided to the system
