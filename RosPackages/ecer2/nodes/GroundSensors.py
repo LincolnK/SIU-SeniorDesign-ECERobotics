@@ -1,7 +1,7 @@
+#!/usr/bin/env python
 """
     ROS Node that sets up listeners for the ground facing IR sensors and publishes them as a LaserScan
 """
-#!/usr/bin/env python
 from math import pi
 #from collections import namedtuple
 import contextlib

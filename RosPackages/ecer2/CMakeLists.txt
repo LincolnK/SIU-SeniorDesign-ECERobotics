@@ -14,6 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   geometry_msgs
   sensor_msgs
+  amcl
+  move_base
+  map_server
   tf2
   tf_conversions
   rplidar_ros
@@ -150,6 +153,15 @@ catkin_install_python(PROGRAMS nodes/GroundSensors.py
 install(DIRECTORY launch/
 	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 	PATTERN ".git" EXCLUDE
+)
+
+install(DIRECTORY yaml/
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+	PATTERN ".git" EXCLUDE
+)
+
+install(FILES test_map.pgm
+	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 
