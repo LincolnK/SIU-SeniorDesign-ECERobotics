@@ -1,0 +1,17 @@
+<launch>
+	<node pkg="ecer2" type="InitialTFPublisher.py" name="tf_static">
+	</node>
+	<!--Static map. This will be replaced by SLAM later--!>
+	<node name="map_server" pkg="map_server" args="$(find ecer2/static_map.pgm 200x200"/>
+	<!-- AMCL will probably be replaced by SLAM later--!>
+	<node pkg="amcl" type="amcl" name="amcl">
+		<rosparam file="ecer2/yaml/amcl_params.yaml" command="load"/>
+	</node>
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base">
+		<rosparam file="ecer2/yaml/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+		<rosparam file="ecer2/yaml/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="ecer2/global_costmap_params.yaml" command="load" ns="global_costmap"/>
+		<rosparam file="ecer2/local_costmap_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="ecer2/base_local_planner_params.yaml" command="load" />
+	</node>
+</launch>
