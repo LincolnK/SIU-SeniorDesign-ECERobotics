@@ -9,21 +9,22 @@ from tf.transformations import quaternion_from_euler
 from geometry_msgs.msg import Twist, Pose, Point, Quaternion
 
 
-def getTransform(frame):
+def getTransform(parentFram,childFrame):
     """
-        build the transform message between base_link and frame
+        build the transform message between a parent and child frame, where both are initially identical in position
 
         Args:
-            frame (string): name of the frame
+            parentFrame (string): name of the parent frame
+            childFrame (string): name of the child frame
 
         Return:
             TransformStamped: A transform message ready to be sent out
     """
     t = tf2_ros.TransformStamped()
     t.header.stamp=rospy.Time.now()
-    t.header.frame_id=frame
-    t.child_frame_id="base_link"
-    t.transform.rotation = Quaternion(*quaternion_from_euler(0,0,0))
+    t.header.frame_id=parentFrame
+    t.child_frame_id=childFrame
+    t.transform.rotation = Quaternion(*quaternion_from_euler(0, 0, 0))
     return t
 
 
@@ -34,5 +35,5 @@ if __name__=="__main__":
         #Static broadcaster can only send one transform. later calls overwrite
         #thus we need array so that we can publish everything at once.
         #this will matter more once things like the LIDAR frame are added
-        tf_publisher.sendTransform([getTransform("world")])
+        tf_publisher.sendTransform([getTransform("map","odom"),getTransform("odom","base_link")])
         rospy.spin()

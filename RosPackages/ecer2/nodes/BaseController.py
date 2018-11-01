@@ -94,7 +94,7 @@ def publish_odom(current_velocities=None):
     #tf2 library's odometry message
     t = tf2_ros.TransformStamped()
     t.header.stamp=rospy.Time.now()
-    t.header.frame_id='world'
+    t.header.frame_id='odom'
     t.child_frame_id='base_link'
     t.transform.translation.x = totalOdom[0]
     t.transform.translation.y = totalOdom[1]
@@ -102,21 +102,21 @@ def publish_odom(current_velocities=None):
 
     o_tf_broadcast.sendTransform(t)
     #Odom topic's message
-    odom=Odometry()
-    odom.header.stamp=current_time
-    odom.header.frame_id="world"
-    odom.pose.pose = Pose(Point(totalOdom[0],totalOdom[1],0.),quat)
-    odom.child_frame_id="base_link"
-    odom.twist.twist =  Twist(Vector3(last_velocities[0],last_velocities[1],0.), Vector3(0.,0.,last_velocities[2]))
+    odom = Odometry()
+    odom.header.stamp = current_time
+    odom.header.frame_id = "world"
+    odom.pose.pose = Pose(Point(totalOdom[0], totalOdom[1], 0.), quat)
+    odom.child_frame_id = "base_link"
+    odom.twist.twist =  Twist(Vector3(last_velocities[0], last_velocities[1], 0.), Vector3(0., 0., last_velocities[2]))
     odom_publisher.publish(odom)
     if current_velocities is not None:
-        last_velocities=current_velocities
-    last_time=current_time
+        last_velocities = current_velocities
+    last_time = current_time
 
 
 
 
-def build_control_callback(right,left,back):
+def build_control_callback(right, left, back):
     """
         Given three motor controllers, will return a callback function to be used when receiving a new velocity command
 
