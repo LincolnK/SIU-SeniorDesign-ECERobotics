@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 r"""
 BaseController translates overall movement goals into speed and direction outputs for the three motors. It does so by solving for the augmented matrix below, which was derived by applying an appropriate rotation matrix to the vector of each motor. It is intended to produce three numbers from -1 to 1, which are the duty cycle and direction of each motor.
 
@@ -13,7 +14,6 @@ s_a & s_a & s_a & V_{rz}
 \\]
 """
 
-#!/usr/bin/env python
 from math import sin,cos,pi
 import traceback
 import numpy
@@ -162,6 +162,7 @@ def listener():
     global tf_buffer
     try:
         rospy.init_node('base_controller')
+        rospy.sleep(1)
         current_time = rospy.Time.now()
         last_time = rospy.Time.now()
         print current_time

@@ -4,14 +4,14 @@ obstacle_range: 3
 #something about how obstacles interact with the map?
 raytrace_range: 4
 #Robot radius in meters. TODO: Actually measure this
-robot_radius: 0.26
+robot_radius: 0.31
 #margin of error (in meters) the planner gives obstacles
 inflation_radius: 0.5
 
 observation_sources: lidar_scanner ground_sensors
 
 #For each sensor data source. Marking means it can mark obstacles. clearing means it can clear obstacles
-lidar_scanner: {sensor_frame: lidar, data_type: LaserScan, topic: lidar_data, marking: true, clearing: true}
+lidar_scanner: {sensor_frame: lidar, data_type: LaserScan, topic: scan, marking: true, clearing: true}
 
 ground_sensors: {sensor_frame: base_link, data_type: LaserScan, topic: ground_scan, marking: true, clearing: false}
 
