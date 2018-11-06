@@ -8,6 +8,8 @@ robot_radius: 0.31
 #margin of error (in meters) the planner gives obstacles
 inflation_radius: 0.5
 
+transform_tolerance: 0.5
+
 observation_sources: lidar_scanner ground_sensors
 
 #For each sensor data source. Marking means it can mark obstacles. clearing means it can clear obstacles

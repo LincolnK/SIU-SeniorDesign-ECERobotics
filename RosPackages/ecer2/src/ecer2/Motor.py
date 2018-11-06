@@ -102,5 +102,5 @@ class Motor(object):
             self._speed=value
             self.forward = direction
             self._dc = abs(value)
-            print self._dc
+            #print self._dc
             self._pwm.ChangeDutyCycle(self._dc)

@@ -1,8 +1,4 @@
 <launch>
-	<node pkg="ecer2" type="InitialTFPublisher.py" name="tf_static">
-	</node>
-	<node pkg="ecer2" type="BaseController.py" name="base_controller">
-	</node>
 	<node pkg="ecer2" type="GroundSensors.py" name="ground_sensors">
 	</node>
 	<node name="rplidarNode" pkg="rplidar_ros" type="rplidarNode" output="screen">
