@@ -29,13 +29,6 @@ max_linear_speed=2#temp
 max_angular_speed=2#temp
 
 
-totalOdom = numpy.array([0.0,0.0])
-"""Current odometry estimate.  3 dimensional numpy array where:
-    0: Estimated distance traveled in x axis
-    1: Estmated distance traveled in y axis
-"""
-totalAngle = 0.0
-
 m1angle=5*pi/6
 m2angle=pi/3
 m3angle=pi
@@ -49,10 +42,6 @@ Coefficient matrix used to calculate motor speeds. Calculated when node is first
 
 """
 
-last_velocities = numpy.array([0,0,0])
-o_tf_broadcast = tf2_ros.TransformBroadcaster()
-odom_publisher = rospy.Publisher("odom",Odometry,queue_size=10)
-tf_buffer =tf2_ros.Buffer()
 
 
 
@@ -76,52 +65,6 @@ def getNewPosition(point):
 
 
 
-def publish_odom(current_velocities=None,first_time=False):
-    """
-        publishes current odometry estimate to tf and odom topics.
-
-        Args:
-            current_velocities (List[float],optional): updated velocity, if applicable. If not given, will use the last cached velocity estimate
-    """
-    global current_time
-    global last_time
-    global totalOdom
-    global totalAngle
-    global last_velocities
-    global odom_publisher
-    current_time = rospy.Time.now()
-    dt = (current_time-last_time).to_sec()
-    dist = last_velocities*float(dt)
-    #totalOdom[2]+=dist[2]#angular movement doesn't need to be changed tf frame
-    transform = numpy.matrix([[cos(totalAngle),-sin(totalAngle)],[sin(totalAngle),cos(totalAngle)]])
-    linear = numpy.matrix(dist[:2]).transpose()
-    linear = transform * linear
-    totalOdom[0]+=linear[0,0]
-    totalOdom[1]+=linear[1,0]
-    totalAngle+=dist[2]
-    #tf2 library's odometry message
-    quat = Quaternion(*quaternion_from_euler(0,0,totalAngle))
-    t = tf2_ros.TransformStamped()
-    t.header.stamp=rospy.Time.now()
-    t.header.frame_id='odom'
-    t.child_frame_id='base_link'
-    t.transform.translation.x = totalOdom[0]
-    t.transform.translation.y = totalOdom[1]
-    t.transform.translation.z = 0.0
-    t.transform.rotation = quat
-
-    o_tf_broadcast.sendTransform(t)
-    #Odom topic's message 
-    odom = Odometry()
-    odom.header.stamp = current_time
-    odom.header.frame_id = "world"
-    odom.pose.pose = Pose(Point(totalOdom[0], totalOdom[1], 0.), quat)
-    odom.child_frame_id = "base_link"
-    odom.twist.twist =  Twist(Vector3(last_velocities[0], last_velocities[1], 0.), Vector3(0., 0., last_velocities[2]))
-    odom_publisher.publish(odom)
-    if current_velocities is not None:
-        last_velocities = current_velocities
-    last_time = current_time
 
 
 
@@ -158,7 +101,6 @@ def build_control_callback(right, left, back):
         right.speed = motorSpeeds[0]
         left.speed = motorSpeeds[1]
         back.speed = motorSpeeds[2]
-        publish_odom(targetVelocities)
     return callback
 
 
@@ -169,28 +111,17 @@ def listener():
     """
     global current_time
     global last_time
-    global tf_buffer
     try:
         rospy.init_node('base_controller')
-        rospy.sleep(1)
         current_time = rospy.Time.now()
         last_time = rospy.Time.now()
         #print current_time
         #print last_time
-        first_time=True
-        publish_rate = rospy.Rate(20)#Publish odom info 4 times per second
-        tf_buffer  = tf2_ros.Buffer()#Set up a tf listener so it's available for odom calculations
-        tf_listener = tf2_ros.TransformListener(tf_buffer)
         #Initialize motors. ContextManager for with block will handle initializing and freeing IO resources
         with Motor(20,21) as right, Motor(19,26) as left, Motor(6,13) as back:
             rospy.Subscriber("cmd_vel",Twist,build_control_callback(right,left,back))
             while not rospy.is_shutdown():
-                publish_rate.sleep()
-                try:
-                    publish_odom(first_time=first_time)
-                    first_time=False
-                except Exception as e:
-                    print "error in main loop",e
+                rospy.spin()
     except Exception as e:
         traceback.print_exc()
 

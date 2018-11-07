@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="ecer2" name="static_tfs" type="InitialTFPublisher.py" output="screen"/>
+	<node pkg="ecer2" name="base_controller" type="BaseController.py" output="screen"/>
+	<node pkg="ecer2" name="odom_estimator" type="OdomEstimator.py"/>
+</launch>
