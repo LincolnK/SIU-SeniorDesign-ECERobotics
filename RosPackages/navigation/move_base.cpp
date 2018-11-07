@@ -475,7 +475,7 @@ namespace move_base {
     tf::Stamped<tf::Pose> global_pose;
     //if(!planner_costmap_ros_->getRobotPose(global_pose)) {
     if(!getRobotPose(global_pose,planner_costmap_ros_)) {
-      ROS_WARN("Unable to get starting pose of robot, unable to create global plan");
+      ROS_WARN_THROTTLE(1.0,"Unable to get starting pose of the robot, unable to create global plan");
       return false;
     }
 
@@ -1141,13 +1141,12 @@ namespace move_base {
       controller_costmap_ros_->stop();
     }
   }
-};
 
-bool MoveBase::getRobotPose(tf:Stamped<tf::Pose>& global_pose,costmap_2d::Costmap2DROS* costmap){
-	global_pose.setIdentify();
+bool MoveBase::getRobotPose(tf::Stamped<tf::Pose>& global_pose,costmap_2d::Costmap2DROS* costmap){
+	global_pose.setIdentity();
 	tf::Stamped <tf::Pose> robot_pose;
-	robot_pose.setIdentify();
-	robot_pose.frame_id = robot_base_frame_;
+	robot_pose.setIdentity();
+	robot_pose.frame_id_ = robot_base_frame_;
 	robot_pose.stamp_ = ros::Time();
 	ros::Time current_time = ros::Time::now();
 	try{
@@ -1173,3 +1172,5 @@ bool MoveBase::getRobotPose(tf:Stamped<tf::Pose>& global_pose,costmap_2d::Costma
 	}
 	return true;
 }
+
+};

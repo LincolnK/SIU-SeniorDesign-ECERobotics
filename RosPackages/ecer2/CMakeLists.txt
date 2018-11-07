@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   amcl
   move_base
+  costmap_2d
   map_server
   tf2
   tf_conversions

@@ -8,7 +8,7 @@ robot_radius: 0.31
 #margin of error (in meters) the planner gives obstacles
 inflation_radius: 0.5
 
-transform_tolerance: 0.5
+transform_tolerance: 0.75
 
 observation_sources: lidar_scanner ground_sensors
 
@@ -17,3 +17,7 @@ lidar_scanner: {sensor_frame: lidar, data_type: LaserScan, topic: scan, marking:
 
 ground_sensors: {sensor_frame: base_link, data_type: LaserScan, topic: ground_scan, marking: true, clearing: false}
 
+
+pose_update_frequency: 1.0 #how often the pose will be checked, in htz
+
+update_frequency: 0.5

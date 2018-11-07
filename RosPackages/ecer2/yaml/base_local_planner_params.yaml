@@ -10,3 +10,4 @@ TrajectoryPlannerROS:
 
   holonomic_robot: true
   meter_scoring: true
+controller_frequency: 4

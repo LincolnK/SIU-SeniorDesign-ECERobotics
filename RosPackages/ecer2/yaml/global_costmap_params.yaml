@@ -2,10 +2,10 @@ global_costmap:
         global_frame: map # defines the coordinate frame that the costmap will run in
         robot_base_frame: base_link # defines the coordinate frame the costmap uses for the robot
         update_frequency: 5.0 # defines frequecy in hertz that the costmap will run at. Reduce it if running slow
-        static_map: false # costmap will initalize based on map provided to the system
-        width: 10
-        height: 10
-        resolution: 0.1
-        origin_x: 0.0
-        origin_y: 0.0
-        rolling_window: true
+        static_map: true # costmap will initalize based on map provided to the system
+        #width: 10
+        #height: 10
+        #resolution: 0.1
+        #origin_x: 0.0
+        #origin_y: 0.0
+        #rolling_window: true

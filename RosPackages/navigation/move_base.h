@@ -164,7 +164,7 @@ namespace move_base {
 
       bool isQuaternionValid(const geometry_msgs::Quaternion& q);
 
-      bool getRobotPose(tf:Stamped<tf::Pose>>& global_pose, costmap_2d::Costmap2DROS* costmap);;
+      bool getRobotPose(tf::Stamped<tf::Pose>& global_pose, costmap_2d::Costmap2DROS* costmap);
 
       double distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
 
