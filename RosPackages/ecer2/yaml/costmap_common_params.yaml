@@ -21,3 +21,5 @@ ground_sensors: {sensor_frame: base_link, data_type: LaserScan, topic: ground_sc
 pose_update_frequency: 1.0 #how often the pose will be checked, in htz
 
 update_frequency: 0.5
+
+map_update_rate: 0.25

@@ -118,7 +118,7 @@ def listener():
         #print current_time
         #print last_time
         #Initialize motors. ContextManager for with block will handle initializing and freeing IO resources
-        with Motor(20,21) as right, Motor(19,26) as left, Motor(6,13) as back:
+        with Motor(direction=20,pwm=21) as right, Motor(direction=26, pwm=19) as left, Motor(direction=16, pwm=12) as back:
             rospy.Subscriber("cmd_vel",Twist,build_control_callback(right,left,back))
             while not rospy.is_shutdown():
                 rospy.spin()

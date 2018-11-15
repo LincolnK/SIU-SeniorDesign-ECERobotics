@@ -7,7 +7,9 @@
 		<param name="frame_id" type="string" value="lidar" />
 		<param name="inverted" type="bool" value="false"/>
 		<param name="angle_compensate" type="bool" value="true"/>
+		<remap from="scan" to="raw_scan"/>
 	</node>
+	<node name="scan_selector" type="scanSelector.py" pkg="ecer2"/>
 	<!-- Static map. This will be replaced by SLAM -->
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find ecer2)/map.yaml" output="screen"/>
 	<!-- AMCL will probably be replaced by SLAM later -->

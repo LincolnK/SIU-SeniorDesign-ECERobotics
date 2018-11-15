@@ -20,8 +20,8 @@ totalOdom = numpy.array([0.0,0.0])
 totalAngle = 0.0
 
 last_velocities = numpy.array([0,0,0])
-odom_publisher = rospy.Publisher("odom",Odometry,queue_size=10)
-tf_broadcast = tf2_ros.TransformBroadcaster()
+odom_publisher = rospy.Publisher("odom",Odometry,queue_size=3)
+tf_broadcast = tf2_ros.TransformBroadcaster(queue_size=20)
 
 
 def publish_odom(current_velocities=None):

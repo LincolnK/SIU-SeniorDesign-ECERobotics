@@ -138,6 +138,10 @@ include_directories(
 catkin_python_setup()
 
 
+catkin_install_python(PROGRAMS nodes/test_commands.py
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 catkin_install_python(PROGRAMS nodes/BaseController.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
@@ -152,6 +156,9 @@ catkin_install_python(PROGRAMS nodes/GroundSensors.py
 )
 
 catkin_install_python(PROGRAMS nodes/OdomEstimator.py
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+catkin_install_python(PROGRAMS nodes/scanSelector.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
