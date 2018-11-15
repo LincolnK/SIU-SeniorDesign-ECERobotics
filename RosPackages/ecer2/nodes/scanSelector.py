@@ -6,15 +6,22 @@ from sensor_msgs.msg import LaserScan
 
 laser_publisher = rospy.Publisher("scan",LaserScan,queue_size=10)
 
+scaling_factor = 3
+
 
 def cb(scan):
     newRanges = []
+    newIntensities = []
     n=0
     for i in scan.ranges:
-        if(n%3==0):
+        if(n%scaling_factor==0):
             newRanges.append(scan.ranges[n])
+            newIntensities.append(scan.intensities[n])
         n+=1
     scan.ranges=newRanges
+    scan.intensities = newIntensities
+    scan.angle_increment*=scaling_factor
+    scan.time_increment*=scaling_factor
     laser_publisher.publish(scan)
 
     
