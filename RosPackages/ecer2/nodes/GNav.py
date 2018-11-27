@@ -35,6 +35,7 @@ def goalReached(pos):
 
 def checkObstacle(angle,distance=1.):
     print "checking angle",angle
+    angle+=angle_adjustment
     def getScans(a,scan):
         n=int((a-scan.angle_min)/scan.angle_increment)
         num = len(scan.ranges)
@@ -71,7 +72,8 @@ def calc_command():
         print "pos is ",pos
         print "goal is", current_goal
         dist = sqrt( (pos[0]-current_goal[0])**2 + (pos[1]-current_goal[1])**2)
-        left_angle = acos((current_goal[0]-pos[0])/dist) + angle_adjustment
+        vec = (pos[0]-current_goal[0],pos[1]-current_goal[1])
+        left_angle = (pi if pos[0]>current_goal[0] else 0) + (pi if pos[1]>current_goal[1]else 0)+ acos((current_goal[0]-pos[0])/dist)
         right_angle = left_angle
         print "initial angle",left_angle
         increment=0.075
@@ -117,8 +119,8 @@ def main_loop():
         try:
             t = tf2_buffer.lookup_transform("base_link","lidar",rospy.Time())
             print t.transform.rotation
-            a = euler_from_quaternion(Quaternion(t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z, t.transform.rotation.w))
-            angle_adjustment=a.z
+            a = euler_from_quaternion([t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z, t.transform.rotation.w])
+            angle_adjustment=a[2]
         except:
             traceback.print_exc()
             rospy.sleep(0.1)
