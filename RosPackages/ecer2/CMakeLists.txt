@@ -150,6 +150,10 @@ catkin_install_python(PROGRAMS nodes/InitialTFPublisher.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+catkin_install_python(PROGRAMS nodes/GNav.py
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 
 catkin_install_python(PROGRAMS nodes/GroundSensors.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
