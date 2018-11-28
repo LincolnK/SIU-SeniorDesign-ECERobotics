@@ -20,10 +20,10 @@ def publish_msg(command):
 def publish_loop():
         i = 0
 	rospy.init_node("test_commands")
-	pb_rate = rospy.Rate(1.0/20.0)
+	pb_rate = rospy.Rate(2.0)
         commands = [(5.0, 0.0), (0.0, 0.0)]
 	while not rospy.is_shutdown():
-                publish_msg(commands[i%2])
+                publish_msg(commands[(i/40)%2])
                 pb_rate.sleep()
                 i += 1
                 
