@@ -13,7 +13,7 @@ from sensor_msgs.msg import LaserScan
 GOAL_TOLERANCE=0.1
 scan_data = None
 current_goal = None
-SPEED = 0.7
+SPEED = 1.3
 tf2_buffer = tf2_ros.Buffer()
 tf2_listener = tf2_ros.TransformListener(tf2_buffer)
 command_publisher = rospy.Publisher("cmd_vel",Twist, queue_size=10)
@@ -70,7 +70,7 @@ def sendCommand(angle,dist=inf):
         command.linear.x=0.
         command.linear.y=0.
     else:
-        sp = (1.0 if dist>3 else 0.3) * SPEED
+        sp = (1.0 if dist>3 else 0.6) * SPEED
         command.linear.x = sp* cos(angle)
         command.linear.y = sp*sin(angle)
         #print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
