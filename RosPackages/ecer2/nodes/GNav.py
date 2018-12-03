@@ -24,7 +24,9 @@ last_pos=None
 
 def getCurrentPoint():
     t = tf2_buffer.lookup_transform("map","base_link",rospy.Time(0),timeout=rospy.Duration(2))
-    return numpy.array([t.transform.translation.x,t.transform.translation.y, t.transform.translation.z])
+    o=t.transform.rotation
+    angle = euler_from_quaternion([o.x,o.y,o.z,o.w])
+    return numpy.array([t.transform.translation.x,t.transform.translation.y, angle[2]])
 
 def goalReached(pos):
     if(current_goal is None):
@@ -37,13 +39,13 @@ def goalReached(pos):
         return False
 
 def checkObstacle(angle,distance=1.5):
-    adjusted=angle-pi/2
+    adjusted=angle#-pi/2
     def getScans(a,scan):
         n=int((a-scan.angle_min)/scan.angle_increment)
         num = len(scan.ranges)
         return (scan.ranges[n%num], scan.ranges[(n+1)%num],scan.intensities[n%num],scan.intensities[(n+1)%num], n)
     s = getScans(adjusted,scan_data)
-    #print "checking angle",adjusted, "distances:", s[0],s[1], "intensities:", s[2],s[3],"n:",s[4], "num scans:", len(scan_data.ranges),"computed:", scan_data.angle_min+s[4]*scan_data.angle_increment
+    print "checking angle",adjusted, "distances:", s[0],s[1], "intensities:", s[2],s[3],"n:",s[4], "num scans:", len(scan_data.ranges),"computed:", scan_data.angle_min+s[4]*scan_data.angle_increment
     return bool((s[0]<distance or s[1]<distance))# or (s[0]==inf and s[2]<1) or (s[1]==inf and s[3]<1)))
 
 
@@ -55,7 +57,7 @@ def sendCommand(angle):
     else:
         command.linear.x = SPEED* cos(angle)
         command.linear.y = SPEED*sin(angle)
-        #print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
+        print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
     command_publisher.publish(command)
 
 
@@ -78,33 +80,35 @@ def calc_command():
         if scan_data is None:
             sendCommand(None)
             return
-        #print "pos is ",pos
-        #print "goal is", current_goal
+        print "pos is ",pos
+        print "goal is", current_goal
         #dist = sqrt( (current_goal[0] - pos[0])**2 + (current_goal[1]-pos[1])**2)
         vec = current_goal-pos
         #vec = (current_goal[0]-pos[0],current_goal[1]-pos[1])
-        #print "vector is",vec
+        print "vector is",vec
         #begin by initializing an angle pointing straight towards goal
         #note. numpy.arctan2 takes care of x/y==x/0, and also quadrants
-        left_angle = numpy.arctan2(vec[1], vec[2])
+        left_angle = numpy.arctan2(vec[1], vec[0])
         #if(vec[1] == 0):
         #    left_angle = (3. if vec[0]<0 else 1.) * pi/2
         #else:
         #    left_angle = numpy.arctan2(vec[1],vec[0])#(pi if vec[1]<0 else 0) + atan(vec[0]/vec[1])
         #left_angle = (pi if pos[0]>current_goal[0] else 0) + (pi if pos[1]>current_goal[1]else 0)+ acos((current_goal[0]-pos[0])/dist)
         right_angle = left_angle
-        #print "initial angle",left_angle
+        print "initial angle",left_angle
         increment = 0.015
         count = 0
         while not found_goal:
             #check each angle for an obstacle. If clear, we can use it
-            if not checkObstacle(left_angle):
+            if not checkObstacle(left_angle,0.75):
                 sendCommand(left_angle)
                 return
-            if not checkObstacle(right_angle):
+            if not checkObstacle(right_angle,0.75):
                 sendCommand(right_angle)
                 return
             #if blocked, try checking further left and right
+            sendCommand(None)#testing
+            return
             left_angle -= increment
             right_angle += increment
             count += 1
@@ -125,7 +129,9 @@ def listen_scan(data):
 
 def listen_goal(data):
     global current_goal
-    current_goal = numpy.array([data.pose.position.x,data.pose.position.y])
+    o=data.pose.orientation
+    angle = euler_from_quaternion([o.x,o.y,o.z,o.w])
+    current_goal = numpy.array([data.pose.position.x,data.pose.position.y,angle[2]])
     calc_command()
 
 
@@ -138,7 +144,7 @@ def main_loop():
     while angle_adjustment is None:
         try:
             t = tf2_buffer.lookup_transform("base_link","lidar",rospy.Time())
-            #print t.transform.rotation
+            print t.transform.rotation
             a = euler_from_quaternion([t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z, t.transform.rotation.w])
             angle_adjustment=a[2]
         except:

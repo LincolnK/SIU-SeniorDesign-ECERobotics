@@ -35,7 +35,7 @@ if __name__=="__main__":
         #Static broadcaster can only send one transform. later calls overwrite
         #thus we need array so that we can publish everything at once.
         #this will matter more once things like the LIDAR frame are added
-        tf_publisher.sendTransform([getTransform("world","map"),getTransform("base_link","lidar",(0.,0.,0.))])
+        tf_publisher.sendTransform([getTransform("map","odom"),getTransform("world","map"),getTransform("base_link","lidar",(0.,0.,0.))])
         initialPose = PoseWithCovarianceStamped()
         initialPose.header.stamp = rospy.Time.now()
         initialPose.header.frame_id="map"

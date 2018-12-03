@@ -12,7 +12,7 @@
 	<node name="map_server" pkg="map_server" type="map_server" args="$(find ecer2)/map.yaml" output="screen"/>
 	<!-- AMCL will probably be replaced by SLAM later -->
 	<node pkg="ecer2" type="GNav.py" name="gnav" output="screen"></node>
-	<node pkg="amcl" type="amcl" name="amcl" output="screen">
+	<!--<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<rosparam file="$(find ecer2)/amcl_params.yaml" command="load"/>
-	</node>
+	</node>-->
 </launch>
