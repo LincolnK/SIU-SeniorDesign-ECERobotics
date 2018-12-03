@@ -53,8 +53,8 @@ def sendCommand(angle):
         command.linear.x=0.
         command.linear.y=0.
     else:
-        command.linear.x = SPEED* sin(angle)
-        command.linear.y = SPEED*cos(angle)
+        command.linear.x = SPEED* cos(angle)
+        command.linear.y = SPEED*sin(angle)
         #print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
     command_publisher.publish(command)
 
