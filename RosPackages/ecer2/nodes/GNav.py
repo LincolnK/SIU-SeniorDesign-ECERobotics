@@ -13,7 +13,7 @@ from sensor_msgs.msg import LaserScan
 GOAL_TOLERANCE=0.1
 scan_data = None
 current_goal = None
-SPEED = 0.5
+SPEED = 0.7
 tf2_buffer = tf2_ros.Buffer()
 tf2_listener = tf2_ros.TransformListener(tf2_buffer)
 command_publisher = rospy.Publisher("cmd_vel",Twist, queue_size=10)
@@ -38,26 +38,42 @@ def goalReached(pos):
     else:
         return False
 
-def checkObstacle(angle,distance=1.5):
+def checkObstacle(angle,distance=1,arc=0.5):
     adjusted=angle#-pi/2
-    def getScans(a,scan):
+    def getScan(a,scan):
         n=int((a-scan.angle_min)/scan.angle_increment)
         num = len(scan.ranges)
-        return (scan.ranges[n%num], scan.ranges[(n+1)%num],scan.intensities[n%num],scan.intensities[(n+1)%num], n)
-    s = getScans(adjusted,scan_data)
-    print "checking angle",adjusted, "distances:", s[0],s[1], "intensities:", s[2],s[3],"n:",s[4], "num scans:", len(scan_data.ranges),"computed:", scan_data.angle_min+s[4]*scan_data.angle_increment
-    return bool((s[0]<distance or s[1]<distance))# or (s[0]==inf and s[2]<1) or (s[1]==inf and s[3]<1)))
+        return (scan.ranges[n%num], scan.intensities[n%num], n)
+        #return (scan.ranges[n%num], scan.ranges[(n+1)%num],scan.intensities[n%num],scan.intensities[(n+1)%num], n)
+    #s = getScans(adjusted,scan_data)
+    #print "checking angle",adjusted, "distances:", s[0],s[1], "intensities:", s[2],s[3],"n:",s[4], "num scans:", len(scan_data.ranges),"computed:", scan_data.angle_min+s[4]*scan_data.angle_increment
+    clear = True
+    min_dist = inf
+    a=angle-arc
+    stop=angle+arc
+    while a<stop:
+        s=getScan(a,scan_data)
+        min_dist=min(min_dist,s[0])
+        if(s[0]<=distance):
+            clear=False
+            break
+        a+=scan_data.angle_increment
+    if clear:
+        return min_dist
+    else:
+        return False
 
 
-def sendCommand(angle):
+def sendCommand(angle,dist=inf):
     command=Twist()
     if angle is None:
         command.linear.x=0.
         command.linear.y=0.
     else:
-        command.linear.x = SPEED* cos(angle)
-        command.linear.y = SPEED*sin(angle)
-        print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
+        sp = (1.0 if dist>3 else 0.3) * SPEED
+        command.linear.x = sp* cos(angle)
+        command.linear.y = sp*sin(angle)
+        #print "sending angle ",angle, "(",command.linear.x,',',command.linear.y,')'
     command_publisher.publish(command)
 
 
@@ -80,12 +96,12 @@ def calc_command():
         if scan_data is None:
             sendCommand(None)
             return
-        print "pos is ",pos
-        print "goal is", current_goal
+        #print "pos is ",pos
+        #print "goal is", current_goal
         #dist = sqrt( (current_goal[0] - pos[0])**2 + (current_goal[1]-pos[1])**2)
         vec = current_goal-pos
         #vec = (current_goal[0]-pos[0],current_goal[1]-pos[1])
-        print "vector is",vec
+        #print "vector is",vec
         #begin by initializing an angle pointing straight towards goal
         #note. numpy.arctan2 takes care of x/y==x/0, and also quadrants
         left_angle = numpy.arctan2(vec[1], vec[0])
@@ -95,16 +111,18 @@ def calc_command():
         #    left_angle = numpy.arctan2(vec[1],vec[0])#(pi if vec[1]<0 else 0) + atan(vec[0]/vec[1])
         #left_angle = (pi if pos[0]>current_goal[0] else 0) + (pi if pos[1]>current_goal[1]else 0)+ acos((current_goal[0]-pos[0])/dist)
         right_angle = left_angle
-        print "initial angle",left_angle
+        #print "initial angle",left_angle
         increment = 0.015
         count = 0
         while not found_goal:
             #check each angle for an obstacle. If clear, we can use it
-            if not checkObstacle(left_angle,0.75):
-                sendCommand(left_angle)
+            dl = checkObstacle(left_angle,0.8)
+            if dl:
+                sendCommand(left_angle,dl)
                 return
-            if not checkObstacle(right_angle,0.75):
-                sendCommand(right_angle)
+            dr = checkObstacle(right_angle,0.8)
+            if dr:
+                sendCommand(right_angle,dr)
                 return
             #if blocked, try checking further left and right
             sendCommand(None)#testing
@@ -144,7 +162,7 @@ def main_loop():
     while angle_adjustment is None:
         try:
             t = tf2_buffer.lookup_transform("base_link","lidar",rospy.Time())
-            print t.transform.rotation
+            #print t.transform.rotation
             a = euler_from_quaternion([t.transform.rotation.x,t.transform.rotation.y,t.transform.rotation.z, t.transform.rotation.w])
             angle_adjustment=a[2]
         except:

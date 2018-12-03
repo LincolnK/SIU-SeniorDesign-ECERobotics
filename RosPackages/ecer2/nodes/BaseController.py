@@ -19,6 +19,7 @@ import traceback
 import numpy
 import rospy
 import tf2_ros
+from std_msgs.msg import Float64
 from tf2_geometry_msgs import do_transform_point
 from tf.transformations import quaternion_from_euler
 from geometry_msgs.msg import Twist,Pose,PointStamped,Point,Quaternion, Vector3,TransformStamped
@@ -26,10 +27,10 @@ from nav_msgs.msg import Odometry
 from ecer2.Motor import Motor
 
 max_linear_speed=1.5#temp
-max_angular_speed=0.9#temp
+max_angular_speed=1.5#temp
 
 
-m1angle=5*pi/6
+m1angle=-pi/3
 m2angle=pi/3
 m3angle=pi
 
@@ -41,6 +42,10 @@ coefficients = numpy.array([
 Coefficient matrix used to calculate motor speeds. Calculated when node is first loaded
 
 """
+
+debug_publisher_left = rospy.Publisher("left_motor",Float64,queue_size=10)
+debug_publisher_right = rospy.Publisher("right_motor",Float64,queue_size=10)
+debug_publisher_back = rospy.Publisher("back_motor",Float64,queue_size=10)
 
 
 
@@ -101,6 +106,10 @@ def build_control_callback(right, left, back):
         right.speed = motorSpeeds[0]
         left.speed = motorSpeeds[1]
         back.speed = motorSpeeds[2]
+        debug_publisher_left.publish(motorSpeeds[1])
+        debug_publisher_right.publish(motorSpeeds[0])
+        debug_publisher_back.publish(motorSpeeds[2])
+
     return callback
 
 
@@ -118,7 +127,7 @@ def listener():
         #print current_time
         #print last_time
         #Initialize motors. ContextManager for with block will handle initializing and freeing IO resources
-        with Motor(direction=20,pwm=21) as right, Motor(direction=26, pwm=19) as back, Motor(direction=16, pwm=12) as left:
+        with Motor(direction=20,pwm=21) as left, Motor(direction=26, pwm=19) as right, Motor(direction=16, pwm=12) as back:
             rospy.Subscriber("cmd_vel",Twist,build_control_callback(right,left,back))
             while not rospy.is_shutdown():
                 rospy.spin()
