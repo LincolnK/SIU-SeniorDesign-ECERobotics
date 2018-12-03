@@ -25,8 +25,8 @@ from geometry_msgs.msg import Twist,Pose,PointStamped,Point,Quaternion, Vector3,
 from nav_msgs.msg import Odometry
 from ecer2.Motor import Motor
 
-max_linear_speed=2#temp
-max_angular_speed=2#temp
+max_linear_speed=1.5#temp
+max_angular_speed=0.9#temp
 
 
 m1angle=5*pi/6
