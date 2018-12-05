@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="ecer2" name="static_transforms" type="InitialTFPublisher"></node>
+	<node pkg="ecer2" name="base_controller" type="BaseController"></node>
+	<node pkg="ecer2" name="ground_sensors" type="GroundSensors"></node>
+</launch>
